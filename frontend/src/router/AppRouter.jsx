@@ -7,6 +7,9 @@ import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import Checkout from '../pages/Checkout';
 import AdminPanel from '../pages/AdminPanel';
+import PrivacyPolicy from '../pages/PrivacyPolicy';
+import TermsConditions from '../pages/TermsConditions';
+import RefundPolicy from '../pages/RefundPolicy';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { AuthContext } from '../context/AuthContext';
@@ -23,12 +26,15 @@ export default function AppRouter() {
         <BrowserRouter>
             <div className="flex flex-col min-h-screen bg-gray-950 text-white font-sans">
                 <Navbar />
-                <main className="flex-grow">
+                <main className="grow">
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/packages" element={<Packages />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                        <Route path="/terms-conditions" element={<TermsConditions />} />
+                        <Route path="/refund-policy" element={<RefundPolicy />} />
                         <Route
                             path="/dashboard"
                             element={

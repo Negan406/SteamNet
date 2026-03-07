@@ -1,5 +1,6 @@
 import React from 'react';
 import { Tv, Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
     return (
@@ -17,9 +18,9 @@ export default function Footer() {
                         </p>
                     </div>
                     <div className="flex space-x-6">
-                        <a href="#" className="text-gray-500 hover:text-indigo-400 transition-colors">Terms</a>
-                        <a href="#" className="text-gray-500 hover:text-indigo-400 transition-colors">Privacy</a>
-                        <a href="#" className="text-gray-500 hover:text-indigo-400 transition-colors">Contact</a>
+                        <Link to="/terms-conditions" className="text-gray-500 hover:text-indigo-400 transition-colors">Terms</Link>
+                        <Link to="/privacy-policy" className="text-gray-500 hover:text-indigo-400 transition-colors">Privacy</Link>
+                        <Link to="/refund-policy" className="text-gray-500 hover:text-indigo-400 transition-colors">Refund</Link>
                     </div>
                 </div>
                 <div className="mt-8 pt-8 border-t border-gray-900 flex items-center justify-center text-gray-500 text-sm">
