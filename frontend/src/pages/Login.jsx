@@ -71,6 +71,11 @@ export default function Login() {
                                 onChange={handleChange}
                             />
                         </div>
+                        <div className="flex justify-end mt-2">
+                            <Link to="/forgot-password" className="text-sm font-medium text-indigo-400 hover:text-indigo-300">
+                                Forgot password?
+                            </Link>
+                        </div>
                     </div>
 
                     <button

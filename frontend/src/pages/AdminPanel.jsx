@@ -3,7 +3,7 @@ import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import Loader from '../components/Loader';
-import { Settings, Users, Package as PkgIcon, Receipt, TrendingUp, Activity, DollarSign } from 'lucide-react';
+import { Settings, Users, Package as PkgIcon, Receipt, TrendingUp, Activity, DollarSign, Database, Server } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Custom Tooltip for Chart
@@ -54,6 +54,10 @@ export default function AdminPanel() {
                     </h1>
                     <p className="text-gray-400 mt-2 text-lg">System Overview & Analytics</p>
                 </div>
+                <div className="flex space-x-4">
+                    <a href="/admin/iptv" className="px-4 py-2 bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600/30 rounded-lg transition-colors font-medium">IPTV Manager</a>
+                    <a href="/admin/subscriptions" className="px-4 py-2 bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600/30 rounded-lg transition-colors font-medium">Subscriptions</a>
+                </div>
             </div>
 
             {/* Top KPI Cards */}
@@ -85,6 +89,26 @@ export default function AdminPanel() {
                     <div className="relative z-10">
                         <p className="text-gray-400 font-medium mb-1">Active Subscriptions</p>
                         <h3 className="text-4xl font-bold text-white">{stats?.active_subscriptions || 0}</h3>
+                    </div>
+                </div>
+
+                <div className="bg-gray-900 border border-gray-800 rounded-3xl p-6 shadow-xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Database className="w-24 h-24 text-indigo-500" />
+                    </div>
+                    <div className="relative z-10">
+                        <p className="text-gray-400 font-medium mb-1">Available Accounts</p>
+                        <h3 className="text-4xl font-bold text-white">{stats?.available_accounts || 0}</h3>
+                    </div>
+                </div>
+
+                <div className="bg-gray-900 border border-gray-800 rounded-3xl p-6 shadow-xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Server className="w-24 h-24 text-red-500" />
+                    </div>
+                    <div className="relative z-10">
+                        <p className="text-gray-400 font-medium mb-1">Sold Accounts</p>
+                        <h3 className="text-4xl font-bold text-white">{stats?.sold_accounts || 0}</h3>
                     </div>
                 </div>
             </div>

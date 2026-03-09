@@ -38,8 +38,8 @@ export default function Checkout() {
             // Redirect to dashboard with success message
             navigate('/dashboard', { state: { message: 'Order completed successfully!' } });
         } catch (error) {
-            console.error("Checkout failed");
-            alert("Checkout failed. Please try again.");
+            console.error("Checkout failed", error.response?.data);
+            alert(error.response?.data?.message || "Checkout failed. Please try again.");
             setProcessing(false);
         }
     };

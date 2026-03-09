@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -15,12 +16,14 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'country' => 'required|string|max:255',
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'country' => $validated['country'],
             'role' => 'user',
         ]);
 
@@ -59,7 +62,8 @@ class AuthController extends Controller
 
     public function profile(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user()->load(['iptvAccounts', 'subscriptions.package']);
+        return response()->json($user);
     }
 
     public function logout(Request $request)
@@ -69,5 +73,33 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logged out successfully'
         ]);
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        
+        $status = Password::sendResetLink($request->only('email'));
+        
+        return $status === Password::RESET_LINK_SENT
+            ? response()->json(['message' => __($status)])
+            : response()->json(['email' => __($status)], 400);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+        
+        $status = Password::reset($request->only('email', 'password', 'password_confirmation', 'token'), function ($user, $password) {
+            $user->forceFill(['password' => Hash::make($password)])->save();
+        });
+        
+        return $status === Password::PASSWORD_RESET
+            ? response()->json(['message' => __($status)])
+            : response()->json(['email' => __($status)], 400);
     }
 }

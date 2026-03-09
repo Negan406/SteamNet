@@ -11,6 +11,8 @@ use App\Http\Middleware\AdminMiddleware;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::get('/packages', [PackageController::class, 'index']);
 Route::get('/packages/{id}', [PackageController::class, 'show']);
@@ -31,6 +33,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('/users', [AdminController::class, 'getUsers']);
         Route::get('/orders', [AdminController::class, 'getOrders']);
+        
+        // IPTV Accounts
+        Route::get('/iptv-accounts', [AdminController::class, 'getIptvAccounts']);
+        Route::post('/iptv-accounts', [AdminController::class, 'storeIptvAccount']);
+        Route::put('/iptv-accounts/{id}', [AdminController::class, 'updateIptvAccount']);
+        Route::delete('/iptv-accounts/{id}', [AdminController::class, 'deleteIptvAccount']);
+        Route::post('/iptv-accounts/import', [AdminController::class, 'importIptvAccounts']);
+
         Route::get('/stats', [AdminController::class, 'dashboardStats']);
     });
 });

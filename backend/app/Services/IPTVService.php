@@ -2,20 +2,33 @@
 
 namespace App\Services;
 
+use App\Models\IptvAccount;
+use Exception;
+
 class IPTVService
 {
     /**
-     * Mock function to provision IPTV.
+     * Assign an available IPTV account to the user.
      */
     public function provisionAccount($user, $package)
     {
-        // In a real application, this would make an API call to an Xtream UI panel, etc.
-        return [
-            'username' => 'user_' . $user->id . '_' . rand(1000, 9999),
-            'password' => bin2hex(random_bytes(4)),
-            'server_url' => 'http://iptv-server.mock:8080',
-            'status' => 'success'
-        ];
+        // Find an available account matching the package category
+        $account = IptvAccount::where('status', 'available')
+                              ->where('category', $package->category)
+                              ->first();
+
+        if (!$account) {
+            throw new Exception("No available {$package->category} IPTV accounts at the moment. Please contact support.");
+        }
+
+        // Assign to user
+        $account->update([
+            'status' => 'sold',
+            'user_id' => $user->id,
+            'expire_date' => now()->addDays($package->duration_days)
+        ]);
+
+        return $account;
     }
 
     /**

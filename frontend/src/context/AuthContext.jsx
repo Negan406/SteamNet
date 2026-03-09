@@ -7,22 +7,26 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const checkUserLoggedIn = async () => {
-            const token = localStorage.getItem('token');
-            if (token) {
-                try {
-                    const response = await api.get('/user');
-                    setUser(response.data);
-                } catch (error) {
-                    console.error("Token invalid or expired");
-                    localStorage.removeItem('token');
-                    setUser(null);
-                }
+    const fetchUser = async () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const response = await api.get('/user');
+                setUser(response.data);
+            } catch (error) {
+                console.error("Token invalid or expired");
+                localStorage.removeItem('token');
+                setUser(null);
             }
+        }
+    };
+
+    useEffect(() => {
+        const initAuth = async () => {
+            await fetchUser();
             setLoading(false);
         };
-        checkUserLoggedIn();
+        initAuth();
     }, []);
 
     const login = async (email, password) => {
@@ -31,8 +35,8 @@ export const AuthProvider = ({ children }) => {
         setUser(response.data.user);
     };
 
-    const register = async (name, email, password, password_confirmation) => {
-        const response = await api.post('/register', { name, email, password, password_confirmation });
+    const register = async (name, email, password, password_confirmation, country) => {
+        const response = await api.post('/register', { name, email, password, password_confirmation, country });
         localStorage.setItem('token', response.data.token);
         setUser(response.data.user);
     };
@@ -52,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout }}>
+        <AuthContext.Provider value={{ user, login, register, logout, fetchUser }}>
             {children}
         </AuthContext.Provider>
     );

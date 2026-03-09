@@ -43,7 +43,13 @@ class OrderController extends Controller
         ]);
 
         // Provision IPTV Account
-        $iptvAccount = $this->iptvService->provisionAccount($user, $package);
+        try {
+            $iptvAccount = $this->iptvService->provisionAccount($user, $package);
+        } catch (\Exception $e) {
+            // Rollback order since we can't fulfill it
+            $order->update(['status' => 'failed']);
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
 
         // Create Subscription
         $subscription = Subscription::create([

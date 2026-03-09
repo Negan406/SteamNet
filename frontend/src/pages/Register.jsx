@@ -6,7 +6,7 @@ import { Mail, Lock, User, UserPlus } from 'lucide-react';
 export default function Register() {
     const { register } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [credentials, setCredentials] = useState({ name: '', email: '', password: '', password_confirmation: '' });
+    const [credentials, setCredentials] = useState({ name: '', email: '', password: '', password_confirmation: '', country: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -21,7 +21,7 @@ export default function Register() {
         }
         setLoading(true);
         try {
-            await register(credentials.name, credentials.email, credentials.password, credentials.password_confirmation);
+            await register(credentials.name, credentials.email, credentials.password, credentials.password_confirmation, credentials.country);
             navigate('/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed');
@@ -72,6 +72,20 @@ export default function Register() {
                                 required
                                 className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl bg-gray-800/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                                 placeholder="you@example.com"
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-2">Country</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                name="country"
+                                required
+                                className="block w-full px-4 py-3 border border-gray-700 rounded-xl bg-gray-800/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                placeholder="E.g. Morocco"
                                 onChange={handleChange}
                             />
                         </div>

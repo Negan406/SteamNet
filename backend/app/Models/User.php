@@ -17,6 +17,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'country',
     ];
 
     protected $hidden = [
@@ -40,5 +41,10 @@ class User extends Authenticatable
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function iptvAccounts(): HasMany
+    {
+        return $this->hasMany(IptvAccount::class);
     }
 }

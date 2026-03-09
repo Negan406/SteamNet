@@ -6,7 +6,11 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import Checkout from '../pages/Checkout';
+import ForgotPassword from '../pages/ForgotPassword';
+import SetupGuide from '../pages/SetupGuide';
 import AdminPanel from '../pages/AdminPanel';
+import AdminIptv from '../pages/AdminIptv';
+import AdminSubscriptions from '../pages/AdminSubscriptions';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
 import TermsConditions from '../pages/TermsConditions';
 import RefundPolicy from '../pages/RefundPolicy';
@@ -32,6 +36,8 @@ export default function AppRouter() {
                         <Route path="/packages" element={<Packages />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/setup-guide" element={<SetupGuide />} />
                         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                         <Route path="/terms-conditions" element={<TermsConditions />} />
                         <Route path="/refund-policy" element={<RefundPolicy />} />
@@ -40,6 +46,30 @@ export default function AppRouter() {
                             element={
                                 <PrivateRoute>
                                     <Dashboard />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/panel"
+                            element={
+                                <PrivateRoute roleRequired="admin">
+                                    <AdminPanel />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/iptv"
+                            element={
+                                <PrivateRoute roleRequired="admin">
+                                    <AdminIptv />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/subscriptions"
+                            element={
+                                <PrivateRoute roleRequired="admin">
+                                    <AdminSubscriptions />
                                 </PrivateRoute>
                             }
                         />

@@ -1,7 +1,7 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Tv, LogOut, LayoutDashboard, ChevronDown, Menu, X } from 'lucide-react';
+import { Tv, LogOut, LayoutDashboard, ChevronDown, Menu, X, Settings } from 'lucide-react';
 
 export default function Navbar() {
     const { user, logout } = useContext(AuthContext);
@@ -67,6 +67,12 @@ export default function Navbar() {
                     <div className="hidden md:flex items-center space-x-4">
                         {user ? (
                             <div className="flex items-center space-x-6">
+                                {user.role === 'admin' && (
+                                    <Link to="/admin/iptv" className="flex items-center space-x-2 text-indigo-400 hover:text-indigo-300 transition-colors font-medium bg-indigo-500/10 px-3 py-1.5 rounded-lg border border-indigo-500/20">
+                                        <Settings className="w-4 h-4" />
+                                        <span>Manage IPTV</span>
+                                    </Link>
+                                )}
                                 <Link to="/dashboard" className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
                                     <LayoutDashboard className="w-5 h-5" />
                                     <span>Dashboard</span>
@@ -121,6 +127,11 @@ export default function Navbar() {
                                         </div>
                                         {user.name}
                                     </div>
+                                    {user.role === 'admin' && (
+                                        <Link to="/admin/iptv" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-3 rounded-md text-base font-medium text-indigo-400 hover:text-indigo-300 hover:bg-gray-800 flex items-center bg-indigo-500/5">
+                                            <Settings className="w-5 h-5 mr-3" /> Manage IPTV
+                                        </Link>
+                                    )}
                                     <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-3 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 flex items-center">
                                         <LayoutDashboard className="w-5 h-5 mr-3" /> Dashboard
                                     </Link>
