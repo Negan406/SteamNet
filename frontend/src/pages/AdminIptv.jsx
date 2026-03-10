@@ -4,9 +4,11 @@ import { AuthContext } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import Loader from '../components/Loader';
 import { Server, Plus, Upload, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 export default function AdminIptv() {
     const { user } = useContext(AuthContext);
+    const { showToast, confirm } = useToast();
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [importLoading, setImportLoading] = useState(false);
@@ -21,6 +23,7 @@ export default function AdminIptv() {
             setAccounts(res.data);
         } catch (error) {
             console.error(error);
+            showToast('Failed to fetch accounts.', 'error');
         } finally {
             setLoading(false);
         }
@@ -39,19 +42,22 @@ export default function AdminIptv() {
         try {
             await api.post('/admin/iptv-accounts', newAccount);
             setNewAccount({ username: '', password: '', server_url: '', category: 'Basic' });
+            showToast('Account added successfully!', 'success');
             fetchAccounts();
         } catch (error) {
-            alert('Failed to add account. Ensure fields are unique/correct.');
+            showToast('Failed to add account. Ensure fields are unique/correct.', 'error');
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this account?')) return;
+        const confirmed = await confirm('Are you sure you want to delete this account? This action cannot be undone.', 'Delete Account');
+        if (!confirmed) return;
         try {
             await api.delete(`/admin/iptv-accounts/${id}`);
+            showToast('Account deleted successfully.', 'success');
             fetchAccounts();
         } catch (error) {
-            alert('Failed to delete account.');
+            showToast('Failed to delete account.', 'error');
         }
     };
 
@@ -67,11 +73,11 @@ export default function AdminIptv() {
             const res = await api.post('/admin/iptv-accounts/import', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            alert(`Import successful: ${res.data.imported} accounts added.`);
+            showToast(`Import successful: ${res.data.imported} accounts added.`, 'success');
             setFile(null);
             fetchAccounts();
         } catch (error) {
-            alert('Import failed. Please check the CSV format.');
+            showToast('Import failed. Please check the CSV format.', 'error');
         } finally {
             setImportLoading(false);
         }

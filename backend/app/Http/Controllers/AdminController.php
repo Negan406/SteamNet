@@ -45,7 +45,7 @@ class AdminController extends Controller
 
     // Orders
     public function getOrders() {
-        return response()->json(Order::with(['user', 'package'])->orderBy('id', 'desc')->get());
+        return response()->json(Order::with(['user.iptvAccounts', 'package'])->orderBy('id', 'desc')->get());
     }
 
     // IPTV Accounts
@@ -125,12 +125,7 @@ class AdminController extends Controller
         $availableAccounts = IptvAccount::where('status', 'available')->count();
         $soldAccounts = IptvAccount::where('status', 'sold')->count();
 
-        // Advanced Category Stats
-        $categoryStats = IptvAccount::selectRaw('category, status, count(*) as count')
-            ->groupBy('category', 'status')
-            ->get();
-
-        // Simple revenue by month chart data (last 6 months)
+        // Revenue by month (last 6 months)
         $revenueChart = Order::selectRaw('SUM(amount) as total, MONTH(created_at) as month, YEAR(created_at) as year')
             ->where('status', 'completed')
             ->where('created_at', '>=', now()->subMonths(6))
@@ -144,14 +139,57 @@ class AdminController extends Controller
                 ];
             });
 
+        // User Growth (last 6 months)
+        $userGrowthChart = User::selectRaw('COUNT(*) as total, MONTH(created_at) as month, YEAR(created_at) as year')
+            ->where('role', 'user')
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->get()->map(function($item) {
+                return [
+                    'name' => date('M', mktime(0, 0, 0, $item->month, 10)),
+                    'users' => (int)$item->total
+                ];
+            });
+
+        // Sales count by month (last 6 months)
+        $salesChart = Order::selectRaw('COUNT(*) as total, MONTH(created_at) as month, YEAR(created_at) as year')
+            ->where('status', 'completed')
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->get()->map(function($item) {
+                return [
+                    'name' => date('M', mktime(0, 0, 0, $item->month, 10)),
+                    'sales' => (int)$item->total
+                ];
+            });
+
+        // Category stats breakdown
+        $categoryDistribution = IptvAccount::selectRaw('category, status, count(*) as count')
+            ->groupBy('category', 'status')
+            ->get();
+
+        // Order status counts
+        $paidOrders = Order::where('status', 'completed')->count();
+        $pendingOrders = Order::where('status', 'pending')->count();
+        $failedOrders = Order::where('status', 'failed')->count();
+
         return response()->json([
             'total_users' => $totalUsers,
             'total_revenue' => $totalRevenue,
             'active_subscriptions' => $activeSubscriptions,
             'available_accounts' => $availableAccounts,
             'sold_accounts' => $soldAccounts,
-            'category_stats' => $categoryStats,
-            'revenue_chart' => $revenueChart
+            'paid_orders' => $paidOrders,
+            'pending_orders' => $pendingOrders,
+            'failed_orders' => $failedOrders,
+            'revenue_chart' => $revenueChart,
+            'user_growth_chart' => $userGrowthChart,
+            'sales_chart' => $salesChart,
+            'category_distribution' => $categoryDistribution
         ]);
     }
 }

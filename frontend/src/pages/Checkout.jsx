@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Loader from '../components/Loader';
 import { CreditCard, ShieldCheck } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 export default function Checkout() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { showToast } = useToast();
     const [pkg, setPkg] = useState(null);
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState(false);
@@ -19,13 +21,14 @@ export default function Checkout() {
                 setPkg(response.data);
             } catch (error) {
                 console.error("Package not found");
+                showToast('Plan not found.', 'error');
                 navigate('/packages');
             } finally {
                 setLoading(false);
             }
         };
         fetchPackage();
-    }, [id, navigate]);
+    }, [id, navigate, showToast]);
 
     const handleCheckout = async (e) => {
         e.preventDefault();
@@ -36,10 +39,11 @@ export default function Checkout() {
                 payment_method: paymentMethod
             });
             // Redirect to dashboard with success message
-            navigate('/dashboard', { state: { message: 'Order completed successfully!' } });
+            showToast('Order completed successfully! Welcome aboard.', 'success');
+            navigate('/dashboard');
         } catch (error) {
             console.error("Checkout failed", error.response?.data);
-            alert(error.response?.data?.message || "Checkout failed. Please try again.");
+            showToast(error.response?.data?.message || "Checkout failed. Please try again.", "error");
             setProcessing(false);
         }
     };

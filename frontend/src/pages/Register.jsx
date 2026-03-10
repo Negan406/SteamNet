@@ -2,9 +2,11 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, User, UserPlus } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 export default function Register() {
     const { register } = useContext(AuthContext);
+    const { showToast } = useToast();
     const navigate = useNavigate();
     const [credentials, setCredentials] = useState({ name: '', email: '', password: '', password_confirmation: '', country: '' });
     const [error, setError] = useState('');
@@ -17,14 +19,18 @@ export default function Register() {
         setError('');
         if (credentials.password !== credentials.password_confirmation) {
             setError('Passwords do not match');
+            showToast('Passwords do not match', 'error');
             return;
         }
         setLoading(true);
         try {
             await register(credentials.name, credentials.email, credentials.password, credentials.password_confirmation, credentials.country);
+            showToast('Registration successful! Welcome.', 'success');
             navigate('/dashboard');
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed');
+            const msg = err.response?.data?.message || 'Registration failed';
+            setError(msg);
+            showToast(msg, 'error');
         } finally {
             setLoading(false);
         }

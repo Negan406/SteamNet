@@ -2,9 +2,11 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, LogIn } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 export default function Login() {
     const { login } = useContext(AuthContext);
+    const { showToast } = useToast();
     const navigate = useNavigate();
     const [credentials, setCredentials] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
@@ -18,9 +20,12 @@ export default function Login() {
         setLoading(true);
         try {
             await login(credentials.email, credentials.password);
+            showToast('Successfully logged in!', 'success');
             navigate('/dashboard');
         } catch (err) {
-            setError(err.response?.data?.message || err.response?.data?.errors?.email?.[0] || 'Failed to login');
+            const msg = err.response?.data?.message || err.response?.data?.errors?.email?.[0] || 'Failed to login';
+            setError(msg);
+            showToast(msg, 'error');
         } finally {
             setLoading(false);
         }

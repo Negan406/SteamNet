@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Play } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { AuthContext } from '../context/AuthContext';
 
 // Home Components
 import CategorySlider from '../components/home/CategorySlider';
@@ -12,6 +13,8 @@ import FeaturesSection from '../components/home/FeaturesSection';
 import DeviceCompatibility from '../components/home/DeviceCompatibility';
 
 export default function Home() {
+    const { user } = useContext(AuthContext);
+
     return (
         <div className="relative overflow-hidden bg-gray-950">
             {/* Background elements */}
@@ -38,8 +41,11 @@ export default function Home() {
                             <Link to="/packages" className="w-full sm:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full font-bold text-lg transition-all duration-300 transform hover:-translate-y-1 shadow-[0_0_20px_rgba(79,70,229,0.4)] flex items-center justify-center">
                                 View Plans <Play className="w-5 h-5 ml-2" />
                             </Link>
-                            <Link to="/register" className="w-full sm:w-auto px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white rounded-full font-bold text-lg transition-all duration-300 flex items-center justify-center">
-                                Free Trial
+                            <Link
+                                to={user ? "/dashboard" : "/register"}
+                                className="w-full sm:w-auto px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white rounded-full font-bold text-lg transition-all duration-300 flex items-center justify-center"
+                            >
+                                {user ? "Go to Dashboard" : "Free Trial"}
                             </Link>
                         </div>
                     </motion.div>

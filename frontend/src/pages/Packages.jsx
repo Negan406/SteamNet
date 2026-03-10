@@ -4,9 +4,11 @@ import PackageCard from '../components/PackageCard';
 import Loader from '../components/Loader';
 import { AuthContext } from '../context/AuthContext';
 import { Plus, X } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 export default function Packages() {
     const { user } = useContext(AuthContext);
+    const { showToast } = useToast();
     const isAdmin = user && user.role === 'admin';
 
     const [packages, setPackages] = useState([]);
@@ -27,13 +29,14 @@ export default function Packages() {
                 setPackages(response.data);
             } catch (error) {
                 console.error('Error fetching packages', error);
+                showToast('Failed to load packages.', 'error');
             } finally {
                 setLoading(false);
             }
         };
 
         fetchPackages();
-    }, [isAdmin]);
+    }, [isAdmin, showToast]);
 
     const handleAdd = () => {
         setModalMode('add');
@@ -48,12 +51,15 @@ export default function Packages() {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this package?')) return;
+        const confirmed = await confirm('Are you sure you want to delete this package? This action cannot be undone.', 'Delete Package');
+        if (!confirmed) return;
         try {
             await api.delete(`/admin/packages/${id}`);
             setPackages(packages.filter(p => p.id !== id));
+            showToast('Package deleted.', 'success');
         } catch (error) {
             console.error('Error deleting package', error);
+            showToast('Failed to delete package.', 'error');
         }
     };
 
@@ -63,14 +69,16 @@ export default function Packages() {
             if (modalMode === 'add') {
                 const response = await api.post('/admin/packages', currentPkg);
                 setPackages([...packages, response.data]);
+                showToast('Package created successfully!', 'success');
             } else {
                 const response = await api.put(`/admin/packages/${currentPkg.id}`, currentPkg);
                 setPackages(packages.map(p => p.id === currentPkg.id ? response.data : p));
+                showToast('Package updated successfully!', 'success');
             }
             setIsModalOpen(false);
         } catch (error) {
             console.error('Error saving package', error);
-            alert('An error occurred. Make sure all fields are valid.');
+            showToast('An error occurred. Make sure all fields are valid.', 'error');
         }
     };
 

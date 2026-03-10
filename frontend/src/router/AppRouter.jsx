@@ -51,11 +51,7 @@ export default function AppRouter() {
                         />
                         <Route
                             path="/admin/panel"
-                            element={
-                                <PrivateRoute roleRequired="admin">
-                                    <AdminPanel />
-                                </PrivateRoute>
-                            }
+                            element={<Navigate to="/dashboard" replace />}
                         />
                         <Route
                             path="/admin/iptv"
