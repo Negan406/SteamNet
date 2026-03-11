@@ -1,5 +1,13 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+
+function ScrollToTop() {
+    const { pathname } = useLocation();
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+    return null;
+}
 import Home from '../pages/Home';
 import Packages from '../pages/Packages';
 import Login from '../pages/Login';
@@ -16,6 +24,7 @@ import TermsConditions from '../pages/TermsConditions';
 import RefundPolicy from '../pages/RefundPolicy';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import AuthCallback from '../pages/AuthCallback';
 import { AuthContext } from '../context/AuthContext';
 
 function PrivateRoute({ children, roleRequired }) {
@@ -28,14 +37,16 @@ function PrivateRoute({ children, roleRequired }) {
 export default function AppRouter() {
     return (
         <BrowserRouter>
+            <ScrollToTop />
             <div className="flex flex-col min-h-screen bg-gray-950 text-white font-sans">
                 <Navbar />
-                <main className="grow">
+                <main className="flex-1 flex flex-col">
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/packages" element={<Packages />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/auth/callback" element={<AuthCallback />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
                         <Route path="/setup-guide" element={<SetupGuide />} />
                         <Route path="/privacy-policy" element={<PrivacyPolicy />} />

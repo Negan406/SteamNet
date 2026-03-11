@@ -88,12 +88,13 @@ class AdminController extends Controller
 
     public function importIptvAccounts(Request $request) {
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt'
+            'csv_file' => 'required|file|mimes:csv,txt'
         ]);
 
-        $file = $request->file('file');
+        $file = $request->file('csv_file');
         $csvData = file_get_contents($file);
-        $lines = explode(PHP_EOL, $csvData);
+        // More robust line splitting for different OS line endings
+        $lines = preg_split('/\r\n|\r|\n/', $csvData);
         $imported = 0;
 
         foreach ($lines as $index => $line) {
@@ -114,7 +115,10 @@ class AdminController extends Controller
             }
         }
 
-        return response()->json(['message' => "$imported accounts imported successfully"]);
+        return response()->json([
+            'message' => "$imported accounts imported successfully",
+            'imported' => $imported
+        ]);
     }
 
     // Dashboard Stats

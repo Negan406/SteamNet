@@ -92,6 +92,25 @@ export default function Login() {
                     </button>
                 </form>
 
+                <div className="relative my-8">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-800"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-gray-900/0 backdrop-blur-3xl text-gray-500 font-medium">ou</span>
+                    </div>
+                </div>
+
+                <div className="space-y-3">
+                    <button
+                        onClick={() => window.location.href = 'http://localhost:8000/api/auth/google'}
+                        className="w-full flex items-center justify-center space-x-3 py-3 px-4 bg-white hover:bg-gray-100 text-gray-900 rounded-xl transition-all font-semibold shadow-lg group"
+                    >
+                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" className="w-5 h-5" />
+                        <span>Continuer avec Google</span>
+                    </button>
+                </div>
+
                 <p className="mt-8 text-center text-sm text-gray-400">
                     Don't have an account?{' '}
                     <Link to="/register" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer relative z-20">

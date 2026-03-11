@@ -11,6 +11,7 @@ import PopularChannels from '../components/home/PopularChannels';
 import MoviesSeriesSlider from '../components/home/MoviesSeriesSlider';
 import FeaturesSection from '../components/home/FeaturesSection';
 import DeviceCompatibility from '../components/home/DeviceCompatibility';
+import HowToBuy from '../components/home/HowToBuy';
 
 export default function Home() {
     const { user } = useContext(AuthContext);
@@ -58,6 +59,7 @@ export default function Home() {
             <PopularChannels />
             <MoviesSeriesSlider />
             <FeaturesSection />
+            <HowToBuy />
             <DeviceCompatibility />
 
         </div>
