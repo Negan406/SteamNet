@@ -22,8 +22,11 @@ import AdminSubscriptions from '../pages/AdminSubscriptions';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
 import TermsConditions from '../pages/TermsConditions';
 import RefundPolicy from '../pages/RefundPolicy';
+import AboutUs from '../pages/AboutUs';
+import Contact from '../pages/Contact';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import WhatsAppSupport from '../components/WhatsAppSupport';
 import AuthCallback from '../pages/AuthCallback';
 import { AuthContext } from '../context/AuthContext';
 
@@ -52,6 +55,8 @@ export default function AppRouter() {
                         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                         <Route path="/terms-conditions" element={<TermsConditions />} />
                         <Route path="/refund-policy" element={<RefundPolicy />} />
+                        <Route path="/about-us" element={<AboutUs />} />
+                        <Route path="/contact" element={<Contact />} />
                         <Route
                             path="/dashboard"
                             element={
@@ -90,6 +95,7 @@ export default function AppRouter() {
                         />
                     </Routes>
                 </main>
+                <WhatsAppSupport />
                 <Footer />
             </div>
         </BrowserRouter>

@@ -344,70 +344,120 @@ export default function Dashboard() {
                 </div>
 
                 {/* IPTV Credentials */}
-                <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-3xl p-8 shadow-2xl backdrop-blur-md relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none">
-                        <Lock className="w-64 h-64 text-white" />
-                    </div>
-                    <h2 className="text-xl font-semibold text-white mb-8 flex items-center relative z-10">
-                        <Lock className="w-6 h-6 mr-3 text-indigo-400" /> Provisioned Access Keys
-                    </h2>
-                    {user?.iptv_accounts && user.iptv_accounts.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
-                            {user.iptv_accounts.filter(acc => acc.status === 'sold').map(account => {
-                                const m3uUrl = `${account.server_url}/get.php?username=${account.username}&password=${account.password}&type=m3u_plus&output=ts`;
-                                return (
-                                    <div key={account.id} className="bg-black/40 rounded-3xl border border-gray-700/50 p-6 flex flex-col space-y-6 hover:border-indigo-500/30 transition-all duration-500 group relative">
-                                        <div className="flex items-center justify-between border-b border-gray-700/50 pb-4">
-                                            <span className="text-white font-black flex items-center text-[10px] uppercase tracking-widest">
-                                                <Server className="w-4 h-4 mr-2 text-indigo-400" /> XTREAM ENGINE
-                                            </span>
-                                        </div>
-                                        <div className="space-y-5">
-                                            {[
-                                                { label: 'HOST ENDPOINT', val: account.server_url },
-                                                { label: 'ID ENTITY', val: account.username },
-                                                { label: 'SECRET KEY', val: account.password }
-                                            ].map((field, i) => (
-                                                <div key={i}>
-                                                    <span className="text-[9px] text-gray-600 uppercase font-black tracking-[0.2em]">{field.label}</span>
-                                                    <div className="flex justify-between items-center bg-black/60 border border-gray-800 rounded-xl px-4 py-3 mt-1.5 group/field hover:border-indigo-500/30 transition-all duration-300 shadow-inner">
-                                                        <span className="text-xs font-mono text-gray-400 truncate pr-2 group-hover/field:text-gray-200">{field.val}</span>
+                <div className="lg:col-span-2 relative">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[2rem] blur opacity-20 transition duration-1000 group-hover:opacity-40"></div>
+                    <div className="relative bg-gray-900 border border-gray-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl overflow-hidden min-h-[500px] flex flex-col">
+                        <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none scale-150 transform rotate-12">
+                            <Tv className="w-64 h-64 text-white" />
+                        </div>
+
+                        <div className="flex items-center justify-between mb-10 relative z-10">
+                            <div>
+                                <h2 className="text-2xl font-bold text-white flex items-center">
+                                    <Lock className="w-7 h-7 mr-3 text-indigo-400" />
+                                    Secure Line Access
+                                </h2>
+                                <p className="text-gray-500 text-sm mt-1">Your premium server credentials and M3U playlist keys.</p>
+                            </div>
+                            <div className="hidden md:flex space-x-2">
+                                <span className="px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 text-[10px] rounded-full uppercase tracking-widest font-bold">Network Online</span>
+                                <span className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] rounded-full uppercase tracking-widest font-bold font-mono">Encrypted 256-bit</span>
+                            </div>
+                        </div>
+
+                        {((user?.iptv_accounts && user.iptv_accounts.length > 0) || (user?.iptvAccounts && user.iptvAccounts.length > 0)) ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10 flex-grow">
+                                {(user?.iptv_accounts || user?.iptvAccounts).filter(acc => acc.status === 'sold').map(account => {
+                                    const m3uUrl = `${account.server_url}/get.php?username=${account.username}&password=${account.password}&type=m3u_plus&output=ts`;
+                                    return (
+                                        <div key={account.id} className="md:col-span-2 space-y-8">
+                                            {/* Credentials Grid */}
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                {[
+                                                    { label: 'Line Endpoint', val: account.server_url, icon: Server },
+                                                    { label: 'Authorized ID', val: account.username, icon: Users },
+                                                    { label: 'Private Key', val: account.password, icon: Lock }
+                                                ].map((field, i) => (
+                                                    <div key={i} className="group/field relative">
+                                                        <div className="bg-black/50 border border-gray-800 rounded-2xl p-5 hover:border-indigo-500/40 transition-all duration-300 shadow-inner overflow-hidden">
+                                                            <div className="flex items-center justify-between mb-3 border-b border-gray-800/50 pb-2">
+                                                                <span className="text-[10px] text-gray-500 uppercase font-black tracking-widest flex items-center">
+                                                                    <field.icon className="w-3 h-3 mr-2 text-indigo-500/70" />
+                                                                    {field.label}
+                                                                </span>
+                                                                <button
+                                                                    onClick={() => handleCopy(field.val, field.label)}
+                                                                    className="text-gray-600 hover:text-indigo-400 transition-all transform hover:scale-110"
+                                                                >
+                                                                    <Copy className="w-3.5 h-3.5" />
+                                                                </button>
+                                                            </div>
+                                                            <div className="text-white font-mono text-xs truncate max-w-full font-semibold">
+                                                                {field.val || '********'}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Playlist Link */}
+                                            <div className="space-y-3">
+                                                <span className="text-[10px] text-gray-500 uppercase font-black tracking-widest flex items-center ml-2">
+                                                    <LinkIcon className="w-3.5 h-3.5 mr-2 text-purple-400" />
+                                                    Direct M3U Plus Playlist
+                                                </span>
+                                                <div className="relative group/m3u">
+                                                    <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl blur opacity-0 group-hover/m3u:opacity-100 transition duration-500"></div>
+                                                    <div className="relative flex justify-between items-center bg-black/60 border border-gray-800 rounded-2xl px-6 py-5 hover:border-indigo-500/30 transition-all duration-300 overflow-hidden">
+                                                        <div className="font-mono text-[11px] text-indigo-300/80 truncate italic pr-4 select-all">
+                                                            {m3uUrl}
+                                                        </div>
                                                         <button
-                                                            onClick={() => handleCopy(field.val, field.label)}
-                                                            className="text-gray-600 hover:text-indigo-400 transition-all transform hover:scale-125 active:scale-90"
+                                                            onClick={() => handleCopy(m3uUrl, 'M3U Link')}
+                                                            className="bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white p-2.5 rounded-xl border border-indigo-500/20 transition-all shadow-lg shrink-0 flex items-center justify-center"
                                                         >
                                                             <Copy className="w-4 h-4" />
                                                         </button>
                                                     </div>
+                                                    <p className="mt-3 text-[10px] text-gray-600 ml-4 italic font-medium italic">
+                                                        Copy this URL into players like VLC, IPTV Smarters, or TiviMate.
+                                                    </p>
                                                 </div>
-                                            ))}
-                                        </div>
-
-                                        <div className="border-t border-gray-700/50 pt-6 mt-4">
-                                            <span className="text-white font-black flex items-center mb-4 text-[10px] uppercase tracking-widest">
-                                                <LinkIcon className="w-4 h-4 mr-2 text-purple-400" /> RAW M3U PLAYLIST
-                                            </span>
-                                            <div className="flex justify-between items-center bg-indigo-500/5 border border-indigo-500/10 rounded-xl px-4 py-3.5 hover:bg-indigo-500/10 transition-all duration-300 group/m3u cursor-default">
-                                                <span className="text-[10px] font-mono text-indigo-300/60 truncate italic">{m3uUrl}</span>
-                                                <button
-                                                    onClick={() => handleCopy(m3uUrl, 'M3U Link')}
-                                                    className="text-indigo-500/40 hover:text-indigo-400 transition-all ml-4 shrink-0 transform hover:scale-125 active:scale-90"
-                                                >
-                                                    <Copy className="w-4 h-4" />
-                                                </button>
                                             </div>
+
+                                            {/* Expiry Warning */}
+                                            {account.expire_date && (
+                                                <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-4 flex items-center justify-center space-x-3 text-indigo-400/80">
+                                                    <Clock className="w-4 h-4" />
+                                                    <span className="text-xs font-bold uppercase tracking-wider">
+                                                        Service Active Until: {new Date(account.expire_date).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        <div className="bg-gray-800/30 rounded-2xl p-16 border border-gray-700/50 text-center relative z-10">
-                            <Activity className="w-16 h-16 text-gray-700 mx-auto mb-6 animate-pulse" />
-                            <h3 className="text-white font-bold mb-2">No Active Keys Detected</h3>
-                            <p className="text-gray-500 max-w-xs mx-auto text-sm leading-relaxed font-medium">Provisioning requires an active premium subscription. Please upgrade your tier in the packages section to unlock access.</p>
-                        </div>
-                    )}
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="flex-grow flex flex-col items-center justify-center p-12 text-center relative z-10">
+                                <div className="bg-gray-800/40 rounded-full p-8 mb-8 border border-gray-700/50 relative">
+                                    <div className="absolute inset-0 bg-indigo-500 blur-2xl opacity-10 rounded-full animate-pulse"></div>
+                                    <Activity className="w-16 h-16 text-gray-700 relative z-10" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-3">Gateway Locked</h3>
+                                <p className="text-gray-500 max-w-sm mx-auto text-base leading-relaxed font-light mb-10">
+                                    No active premium line detected. Once order provisioning is complete, your secure keys will appear here instantly.
+                                </p>
+                                <a
+                                    href="/packages"
+                                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-10 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-indigo-500/30 flex items-center space-x-2 group-hover:scale-105 active:scale-95"
+                                >
+                                    <span>Browse Packages</span>
+                                    <PkgIcon className="w-4 h-4 ml-2" />
+                                </a>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

@@ -186,12 +186,12 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/');
             return redirect($frontendUrl . '/auth/callback?token=' . $token);
 
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Google Auth Error: ' . $e->getMessage());
-            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/');
             return redirect($frontendUrl . '/login?error=Google authentication failed');
         }
     }

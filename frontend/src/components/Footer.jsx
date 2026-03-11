@@ -17,7 +17,9 @@ export default function Footer() {
                             Experience the future of television securely and reliably.
                         </p>
                     </div>
-                    <div className="flex space-x-6">
+                    <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2">
+                        <Link to="/about-us" className="text-gray-500 hover:text-indigo-400 transition-colors">About Us</Link>
+                        <Link to="/contact" className="text-gray-500 hover:text-indigo-400 transition-colors">Contact</Link>
                         <Link to="/terms-conditions" className="text-gray-500 hover:text-indigo-400 transition-colors">Terms</Link>
                         <Link to="/privacy-policy" className="text-gray-500 hover:text-indigo-400 transition-colors">Privacy</Link>
                         <Link to="/refund-policy" className="text-gray-500 hover:text-indigo-400 transition-colors">Refund</Link>

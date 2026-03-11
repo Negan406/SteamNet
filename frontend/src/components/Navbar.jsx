@@ -43,7 +43,9 @@ export default function Navbar() {
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-8">
                         <Link to="/" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium">Home</Link>
+                        <Link to="/about-us" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium">About Us</Link>
                         <Link to="/packages" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium">Packages</Link>
+                        <Link to="/contact" className="text-gray-300 hover:text-white transition-colors duration-200 font-medium">Contact</Link>
 
                         {/* Desktop Dropdown */}
                         <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
@@ -109,7 +111,9 @@ export default function Navbar() {
                 <div className="md:hidden bg-gray-900 border-b border-gray-800 animate-in slide-in-from-top-5 duration-300 absolute w-full left-0 top-full shadow-2xl z-40">
                     <div className="px-4 pt-2 pb-6 space-y-2">
                         <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Home</Link>
+                        <Link to="/about-us" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">About Us</Link>
                         <Link to="/packages" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Packages</Link>
+                        <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block px-3 py-3 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Contact</Link>
 
                         <div className="px-3 py-3 text-gray-400 uppercase tracking-wider text-xs font-bold mt-4">Our Policies</div>
                         <div className="space-y-1 pl-4">
