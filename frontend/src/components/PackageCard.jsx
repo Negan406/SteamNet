@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Zap, Pencil, Trash2 } from 'lucide-react';
+import { CheckCircle, Zap, Pencil, Trash2, Tv } from 'lucide-react';
 
 export default function PackageCard({ pkg, isPopular = false, isAdmin = false, onEdit, onDelete }) {
     return (
-        <div className={`relative flex flex-col p-8 bg-gray-900/50 backdrop-blur-md border rounded-3xl transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-2xl ${isPopular ? 'border-indigo-500 shadow-[0_0_30px_rgba(79,70,229,0.15)]' : 'border-gray-800'}`}>
+        <div className={`relative flex flex-col p-8 bg-gray-900/50 backdrop-blur-md border rounded-3xl transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-2xl ${isPopular ? 'border-indigo-500 shadow-[0_0_30px_rgba(79,70,229,0.15)]' : (pkg.type === 'netflix' ? 'border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.15)]' : 'border-gray-800')}`}>
             {isAdmin && (
                 <div className="absolute top-4 right-4 flex space-x-2 z-10">
                     <button onClick={() => onEdit(pkg)} className="p-2 bg-indigo-600 hover:bg-indigo-500 rounded-full text-white transition-colors shadow-lg">
@@ -16,8 +16,17 @@ export default function PackageCard({ pkg, isPopular = false, isAdmin = false, o
                 </div>
             )}
 
+            {pkg.type === 'netflix' && (
+                <div className="absolute -top-4 left-4 z-10">
+                    <span className="bg-red-600 text-white px-3 py-1 rounded-lg text-[10px] font-black tracking-widest uppercase flex items-center space-x-1 shadow-lg border border-red-500/30">
+                        <Tv className="w-3 h-3" />
+                        <span>Netflix</span>
+                    </span>
+                </div>
+            )}
+
             {isPopular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                <div className="absolute -top-4 right-4 z-10">
                     <span className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-1 rounded-full text-sm font-semibold tracking-wide flex items-center space-x-1">
                         <Zap className="w-4 h-4" />
                         <span>Most Popular</span>
@@ -39,27 +48,50 @@ export default function PackageCard({ pkg, isPopular = false, isAdmin = false, o
                     <CheckCircle className="w-5 h-5 text-indigo-400 mr-3 shrink-0" />
                     <span>{pkg.duration_days} Days Access</span>
                 </li>
-                <li className="flex items-center text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-indigo-400 mr-3 shrink-0" />
-                    <span>20,000+ Live Channels</span>
-                </li>
-                <li className="flex items-center text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-indigo-400 mr-3 shrink-0" />
-                    <span>VOD (Movies & Series)</span>
-                </li>
-                <li className="flex items-center text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-indigo-400 mr-3 shrink-0" />
-                    <span>4K & FHD Quality</span>
-                </li>
-                <li className="flex items-center text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-indigo-400 mr-3 shrink-0" />
-                    <span>Anti-Freeze Technology</span>
-                </li>
+                {pkg.type === 'netflix' ? (
+                    <>
+                        <li className="flex items-center text-gray-300">
+                            <CheckCircle className="w-5 h-5 text-red-500 mr-3 shrink-0" />
+                            <span>Ultra HD 4K + HDR</span>
+                        </li>
+                        <li className="flex items-center text-gray-300">
+                            <CheckCircle className="w-5 h-5 text-red-500 mr-3 shrink-0" />
+                            <span>Watch on any device</span>
+                        </li>
+                        <li className="flex items-center text-gray-300">
+                            <CheckCircle className="w-5 h-5 text-red-500 mr-3 shrink-0" />
+                            <span>Unlimited Movies & TV</span>
+                        </li>
+                        <li className="flex items-center text-gray-300">
+                            <CheckCircle className="w-5 h-5 text-red-500 mr-3 shrink-0" />
+                            <span>Ad-free Experience</span>
+                        </li>
+                    </>
+                ) : (
+                    <>
+                        <li className="flex items-center text-gray-300">
+                            <CheckCircle className="w-5 h-5 text-indigo-400 mr-3 shrink-0" />
+                            <span>20,000+ Live Channels</span>
+                        </li>
+                        <li className="flex items-center text-gray-300">
+                            <CheckCircle className="w-5 h-5 text-indigo-400 mr-3 shrink-0" />
+                            <span>VOD (Movies & Series)</span>
+                        </li>
+                        <li className="flex items-center text-gray-300">
+                            <CheckCircle className="w-5 h-5 text-indigo-400 mr-3 shrink-0" />
+                            <span>4K & FHD Quality</span>
+                        </li>
+                        <li className="flex items-center text-gray-300">
+                            <CheckCircle className="w-5 h-5 text-indigo-400 mr-3 shrink-0" />
+                            <span>Anti-Freeze Technology</span>
+                        </li>
+                    </>
+                )}
             </ul>
 
             <Link
                 to={`/checkout/${pkg.id}`}
-                className={`w-full py-4 rounded-xl font-bold text-lg text-center transition-all duration-300 ${isPopular ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'bg-gray-800 hover:bg-gray-700 text-white'}`}
+                className={`w-full py-4 rounded-xl font-bold text-lg text-center transition-all duration-300 ${isPopular ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : (pkg.type === 'netflix' ? 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-500/20' : 'bg-gray-800 hover:bg-gray-700 text-white')}`}
             >
                 Get Started
             </Link>

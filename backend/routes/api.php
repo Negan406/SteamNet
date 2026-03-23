@@ -21,6 +21,12 @@ Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallbac
 Route::get('/packages', [PackageController::class, 'index']);
 Route::get('/packages/{id}', [PackageController::class, 'show']);
 
+// CMI Callbacks
+Route::post('/cmi/callback', [\App\Http\Controllers\PaymentCallbackController::class, 'handleCmiCallback']);
+Route::get('/cmi/success', [\App\Http\Controllers\PaymentCallbackController::class, 'handleSuccess']);
+Route::get('/cmi/failure', [\App\Http\Controllers\PaymentCallbackController::class, 'handleFailure']);
+Route::any('/cmi/mock', function() { return view('cmi_mock', ['params' => request()->all()]); });
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -37,6 +43,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('/users', [AdminController::class, 'getUsers']);
         Route::get('/orders', [AdminController::class, 'getOrders']);
+        Route::post('/orders/{id}/approve', [AdminController::class, 'approveOrder']);
+        Route::post('/orders/{id}/reject', [AdminController::class, 'rejectOrder']);
         
         // IPTV Accounts
         Route::get('/iptv-accounts', [AdminController::class, 'getIptvAccounts']);
@@ -44,6 +52,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/iptv-accounts/{id}', [AdminController::class, 'updateIptvAccount']);
         Route::delete('/iptv-accounts/{id}', [AdminController::class, 'deleteIptvAccount']);
         Route::post('/iptv-accounts/import', [AdminController::class, 'importIptvAccounts']);
+
+        // Netflix Accounts
+        Route::get('/netflix-accounts', [AdminController::class, 'getNetflixAccounts']);
+        Route::post('/netflix-accounts', [AdminController::class, 'storeNetflixAccount']);
+        Route::put('/netflix-accounts/{id}', [AdminController::class, 'updateNetflixAccount']);
+        Route::delete('/netflix-accounts/{id}', [AdminController::class, 'deleteNetflixAccount']);
 
         Route::get('/stats', [AdminController::class, 'dashboardStats']);
     });

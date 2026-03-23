@@ -6,10 +6,39 @@ use App\Models\Package;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\IptvAccount;
+use App\Models\NetflixAccount;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
+    public function __construct(
+        protected \App\Services\OrderService $orderService
+    ) {}
+
+    // Orders
+    public function approveOrder($id) {
+        $order = Order::findOrFail($id);
+        if ($order->status === 'completed') {
+            return response()->json(['message' => 'Order already completed'], 400);
+        }
+
+        try {
+            $result = $this->orderService->fulfill($order);
+            return response()->json([
+                'message' => 'Order approved and account provisioned',
+                'order' => $result['order']
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function rejectOrder($id) {
+        $order = Order::findOrFail($id);
+        $order->update(['status' => 'failed']);
+        return response()->json(['message' => 'Order rejected']);
+    }
+
     // Packages
     public function getPackages() {
         return response()->json(Package::orderBy('id', 'desc')->get());
@@ -86,6 +115,46 @@ class AdminController extends Controller
         return response()->json(['message' => 'Deleted']);
     }
 
+    // Netflix Accounts
+    public function getNetflixAccounts() {
+        return response()->json(NetflixAccount::with('user')->orderBy('id', 'desc')->get());
+    }
+
+    public function storeNetflixAccount(Request $request) {
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+            'profile_name' => 'nullable|string',
+            'pin' => 'nullable|string',
+            'category' => 'required|string',
+            'expire_date' => 'nullable|date',
+            'status' => 'in:available,sold',
+            'user_id' => 'nullable|exists:users,id'
+        ]);
+        return response()->json(NetflixAccount::create($validated), 201);
+    }
+
+    public function updateNetflixAccount(Request $request, $id) {
+        $account = NetflixAccount::findOrFail($id);
+        $validated = $request->validate([
+            'email' => 'email',
+            'password' => 'string',
+            'profile_name' => 'nullable|string',
+            'pin' => 'nullable|string',
+            'category' => 'string',
+            'expire_date' => 'nullable|date',
+            'status' => 'in:available,sold',
+            'user_id' => 'nullable|exists:users,id'
+        ]);
+        $account->update($validated);
+        return response()->json($account);
+    }
+
+    public function deleteNetflixAccount($id) {
+        NetflixAccount::destroy($id);
+        return response()->json(['message' => 'Deleted']);
+    }
+
     public function importIptvAccounts(Request $request) {
         $request->validate([
             'csv_file' => 'required|file|mimes:csv,txt'
@@ -126,8 +195,8 @@ class AdminController extends Controller
         $totalUsers = User::where('role', 'user')->count();
         $totalRevenue = Order::where('status', 'completed')->sum('amount');
         $activeSubscriptions = \App\Models\Subscription::where('status', 'active')->count();
-        $availableAccounts = IptvAccount::where('status', 'available')->count();
-        $soldAccounts = IptvAccount::where('status', 'sold')->count();
+        $availableAccounts = IptvAccount::where('status', 'available')->count() + NetflixAccount::where('status', 'available')->count();
+        $soldAccounts = IptvAccount::where('status', 'sold')->count() + NetflixAccount::where('status', 'sold')->count();
 
         // Revenue by month (last 6 months)
         $revenueChart = Order::selectRaw('SUM(amount) as total, MONTH(created_at) as month, YEAR(created_at) as year')
@@ -172,9 +241,14 @@ class AdminController extends Controller
             });
 
         // Category stats breakdown
-        $categoryDistribution = IptvAccount::selectRaw('category, status, count(*) as count')
+        $categoryDistribution = IptvAccount::selectRaw("'iptv' as type, category, status, count(*) as count")
             ->groupBy('category', 'status')
-            ->get();
+            ->get()
+            ->merge(
+                NetflixAccount::selectRaw("'netflix' as type, category, status, count(*) as count")
+                    ->groupBy('category', 'status')
+                    ->get()
+            );
 
         // Order status counts
         $paidOrders = Order::where('status', 'completed')->count();

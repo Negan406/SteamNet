@@ -12,6 +12,7 @@ import MoviesSeriesSlider from '../components/home/MoviesSeriesSlider';
 import FeaturesSection from '../components/home/FeaturesSection';
 import DeviceCompatibility from '../components/home/DeviceCompatibility';
 import HowToBuy from '../components/home/HowToBuy';
+import NetflixShowcase from '../components/home/NetflixShowcase';
 
 export default function Home() {
     const { user } = useContext(AuthContext);
@@ -57,6 +58,7 @@ export default function Home() {
             <CategorySlider />
             <LiveSportsPreview />
             <PopularChannels />
+            <NetflixShowcase />
             <MoviesSeriesSlider />
             <FeaturesSection />
             <HowToBuy />

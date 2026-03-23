@@ -49,4 +49,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(IptvAccount::class);
     }
+
+    public function netflixAccounts(): HasMany
+    {
+        return $this->hasMany(NetflixAccount::class);
+    }
 }

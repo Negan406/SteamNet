@@ -4,6 +4,7 @@ import api from '../services/api';
 import Loader from '../components/Loader';
 import { CreditCard, ShieldCheck } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { motion } from 'framer-motion';
 
 export default function Checkout() {
     const { id } = useParams();
@@ -38,8 +39,27 @@ export default function Checkout() {
                 package_id: pkg.id,
                 payment_method: paymentMethod
             });
-            // Redirect to dashboard with success message
-            showToast('Order completed successfully! Welcome aboard.', 'success');
+
+            if (response.data.payment_url) {
+                // CMI Form Redirect Logic
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = response.data.payment_url;
+
+                Object.entries(response.data.payment_params).forEach(([key, value]) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
+                });
+
+                document.body.appendChild(form);
+                form.submit();
+                return;
+            }
+
+            showToast(response.data.message || 'Order completed successfully! Welcome aboard.', 'success');
             navigate('/dashboard');
         } catch (error) {
             console.error("Checkout failed", error.response?.data);
@@ -113,6 +133,19 @@ export default function Checkout() {
                                         PayPal
                                     </span>
                                 </label>
+                                <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'cmi' ? 'border-orange-600 bg-orange-600/10' : 'border-gray-700 hover:border-gray-500'}`}>
+                                    <input
+                                        type="radio"
+                                        name="payment_method"
+                                        value="cmi"
+                                        checked={paymentMethod === 'cmi'}
+                                        onChange={() => setPaymentMethod('cmi')}
+                                        className="text-orange-600 focus:ring-orange-600 h-4 w-4 bg-gray-800 border-gray-600"
+                                    />
+                                    <span className="ml-3 text-white font-medium flex items-center gap-2">
+                                        <CreditCard className="w-4 h-4 text-orange-500" /> CMI (Moroccan Credit Cards)
+                                    </span>
+                                </label>
                                 <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'crypto' ? 'border-orange-500 bg-orange-500/10' : 'border-gray-700 hover:border-gray-500'}`}>
                                     <input
                                         type="radio"
@@ -123,20 +156,62 @@ export default function Checkout() {
                                         className="text-orange-600 focus:ring-orange-500 h-4 w-4 bg-gray-800 border-gray-600"
                                     />
                                     <span className="ml-3 text-white font-medium flex items-center gap-2">
-                                        Cryptocurrency (BTC/ETH)
+                                        Binance Pay / Crypto (TRC20)
+                                    </span>
+                                </label>
+                                <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'bank_transfer' ? 'border-emerald-500 bg-emerald-500/10' : 'border-gray-700 hover:border-gray-500'}`}>
+                                    <input
+                                        type="radio"
+                                        name="payment_method"
+                                        value="bank_transfer"
+                                        checked={paymentMethod === 'bank_transfer'}
+                                        onChange={() => setPaymentMethod('bank_transfer')}
+                                        className="text-emerald-600 focus:ring-emerald-500 h-4 w-4 bg-gray-800 border-gray-600"
+                                    />
+                                    <span className="ml-3 text-white font-medium flex items-center gap-2">
+                                        Bank Transfer
                                     </span>
                                 </label>
                             </div>
+
+                            {/* Conditional Payment Instructions */}
+                            {paymentMethod === 'crypto' && (
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-5 bg-orange-500/5 border border-orange-500/20 rounded-2xl space-y-3">
+                                    <p className="text-[10px] text-orange-500 font-black uppercase tracking-widest">TRC20 Wallet Address</p>
+                                    <div className="bg-black/60 p-3 rounded-xl font-mono text-xs text-white break-all border border-white/5 select-all cursor-pointer hover:bg-black/80 transition-colors">
+                                        TJw4v3HdQp6S7Y9vR2U1n9C8Xm5B4Z2Q1W
+                                    </div>
+                                    <p className="text-[10px] text-gray-500 leading-tight">
+                                        * Please transfer exactly <span className="text-white font-bold">${pkg.price} USDT</span>. Your account will be activated once confirmed on the blockchain.
+                                    </p>
+                                </motion.div>
+                            )}
+
+                            {paymentMethod === 'bank_transfer' && (
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-5 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl space-y-3">
+                                    <p className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Bank Details (IBAN)</p>
+                                    <div className="bg-black/60 p-4 rounded-xl space-y-2 border border-white/5">
+                                        <div className="flex justify-between text-[11px]"><span className="text-gray-500">Bank:</span> <span className="text-white font-bold">Global Bank Trust</span></div>
+                                        <div className="flex justify-between text-[11px]"><span className="text-gray-500">Beneficiary:</span> <span className="text-white font-bold">SteamNet IPTV LTD</span></div>
+                                        <div className="flex justify-between text-[11px]"><span className="text-gray-500">IBAN:</span> <span className="text-white font-bold tracking-wider select-all">GB33 4600 0000 1234 5678 90</span></div>
+                                    </div>
+                                    <p className="text-[10px] text-gray-500 leading-tight">
+                                        * Please use your username as the transfer reference. Orders are processed within 1-12 hours during business hours.
+                                    </p>
+                                </motion.div>
+                            )}
 
                             <button
                                 type="submit"
                                 disabled={processing}
                                 className="w-full py-4 rounded-xl font-bold text-lg text-center bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-all transform hover:-translate-y-0.5 disabled:opacity-50 mt-4"
                             >
-                                {processing ? 'Processing Payment...' : `Pay $${pkg.price} Now`}
+                                {processing ? 'Processing Order...' :
+                                    (paymentMethod === 'crypto' || paymentMethod === 'bank_transfer') ? 'Confirm Payment & Order' : `Pay $${pkg.price} Now`}
                             </button>
-                            <p className="text-xs text-gray-500 text-center mt-4">
-                                By completing this purchase, you agree to our Terms of Service and Privacy Policy. All payments are processed securely.
+                            <p className="text-xs text-gray-500 text-center mt-4 leading-relaxed">
+                                By clicking the button above, you agree to our <span className="text-white underline cursor-pointer">Terms of Service</span>.
+                                {(paymentMethod === 'crypto' || paymentMethod === 'bank_transfer') && " Your order will be activated as soon as we verify the payment."}
                             </p>
                         </form>
                     </div>

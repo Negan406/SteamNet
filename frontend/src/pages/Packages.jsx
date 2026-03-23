@@ -17,7 +17,7 @@ export default function Packages() {
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('add');
-    const [currentPkg, setCurrentPkg] = useState({ name: '', description: '', price: '', duration_days: '', is_active: true });
+    const [currentPkg, setCurrentPkg] = useState({ name: '', type: 'iptv', description: '', price: '', duration_days: '', is_active: true });
 
     useEffect(() => {
         const fetchPackages = async () => {
@@ -40,7 +40,7 @@ export default function Packages() {
 
     const handleAdd = () => {
         setModalMode('add');
-        setCurrentPkg({ name: '', description: '', price: '', duration_days: '', is_active: true });
+        setCurrentPkg({ name: '', type: 'iptv', description: '', price: '', duration_days: '', is_active: true });
         setIsModalOpen(true);
     };
 
@@ -136,6 +136,17 @@ export default function Packages() {
                                     className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                                     placeholder="e.g. Basic Plan"
                                 />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">Type</label>
+                                <select
+                                    value={currentPkg.type}
+                                    onChange={(e) => setCurrentPkg({ ...currentPkg, type: e.target.value })}
+                                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors appearance-none font-bold"
+                                >
+                                    <option value="iptv">IPTV Service</option>
+                                    <option value="netflix">Netflix Account</option>
+                                </select>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>

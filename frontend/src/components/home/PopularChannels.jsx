@@ -14,10 +14,10 @@ const channels = [
     { id: 2, name: 'Sky Sports', img: skySportsLogo, isDark: false, showColor: true },
     { id: 3, name: 'HBO', img: 'https://upload.wikimedia.org/wikipedia/commons/d/de/HBO_logo.svg', isDark: true, showColor: true },
     { id: 4, name: 'ESPN', img: espnLogo, isDark: false, showColor: true },
-    { id: 5, name: 'Fox News', img: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Fox_News_Channel_logo.svg', isDark: false, showColor: true },
     { id: 6, name: 'Disney', img: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Disney_wordmark.svg', isDark: true, showColor: true },
     { id: 7, name: 'Discovery', img: discoveryLogo, isDark: true, showColor: true },
     { id: 8, name: 'Nat Geo', img: natGeoLogo, isDark: false, showColor: true, isNatGeo: true },
+    { id: 5, name: 'Netflix', img: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg', isDark: true, showColor: true },
 ];
 
 export default function PopularChannels() {

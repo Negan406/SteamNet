@@ -8,7 +8,9 @@ export default function Navbar() {
     const navigate = useNavigate();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isAdminDropdownOpen, setIsAdminDropdownOpen] = useState(false);
     const dropdownTimeoutRef = useRef(null);
+    const adminDropdownTimeoutRef = useRef(null);
 
     const handleLogout = async () => {
         await logout();
@@ -70,10 +72,38 @@ export default function Navbar() {
                         {user ? (
                             <div className="flex items-center space-x-6">
                                 {user.role === 'admin' && (
-                                    <Link to="/admin/iptv" className="flex items-center space-x-2 text-indigo-400 hover:text-indigo-300 transition-colors font-medium bg-indigo-500/10 px-3 py-1.5 rounded-lg border border-indigo-500/20">
-                                        <Settings className="w-4 h-4" />
-                                        <span>Manage IPTV</span>
-                                    </Link>
+                                    <div
+                                        className="relative"
+                                        onMouseEnter={() => {
+                                            clearTimeout(adminDropdownTimeoutRef.current);
+                                            setIsAdminDropdownOpen(true);
+                                        }}
+                                        onMouseLeave={() => {
+                                            adminDropdownTimeoutRef.current = setTimeout(() => {
+                                                setIsAdminDropdownOpen(false);
+                                            }, 150);
+                                        }}
+                                    >
+                                        <button className="flex items-center space-x-2 text-indigo-400 hover:text-indigo-300 transition-colors font-medium bg-indigo-500/10 px-4 py-2 rounded-xl border border-indigo-500/20 group">
+                                            <Settings className="w-4 h-4 group-hover:rotate-90 transition-transform duration-500" />
+                                            <span>Manage Inventory</span>
+                                            <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isAdminDropdownOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {isAdminDropdownOpen && (
+                                            <div className="absolute top-full right-0 mt-2 w-48 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                                <div className="py-2">
+                                                    <Link to="/admin/iptv" onClick={() => setIsAdminDropdownOpen(false)} className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
+                                                        <Tv className="w-4 h-4 text-indigo-400" />
+                                                        <span>IPTV Accounts</span>
+                                                    </Link>
+                                                    <Link to="/admin/netflix" onClick={() => setIsAdminDropdownOpen(false)} className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors border-t border-gray-800/50">
+                                                        <Tv className="w-4 h-4 text-red-500" />
+                                                        <span>Netflix Accounts</span>
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                                 <Link to="/dashboard" className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
                                     <LayoutDashboard className="w-5 h-5" />
@@ -132,9 +162,15 @@ export default function Navbar() {
                                         {user.name}
                                     </div>
                                     {user.role === 'admin' && (
-                                        <Link to="/admin/iptv" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-3 rounded-md text-base font-medium text-indigo-400 hover:text-indigo-300 hover:bg-gray-800 flex items-center bg-indigo-500/5">
-                                            <Settings className="w-5 h-5 mr-3" /> Manage IPTV
-                                        </Link>
+                                        <div className="space-y-1">
+                                            <div className="px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-widest mt-2">Inventory Management</div>
+                                            <Link to="/admin/iptv" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-3 rounded-md text-base font-medium text-indigo-400 hover:text-indigo-300 hover:bg-gray-800 flex items-center bg-indigo-500/5">
+                                                <Tv className="w-5 h-5 mr-3" /> IPTV Accounts
+                                            </Link>
+                                            <Link to="/admin/netflix" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-3 rounded-md text-base font-medium text-red-400 hover:text-red-300 hover:bg-gray-800 flex items-center bg-red-500/5">
+                                                <Tv className="w-5 h-5 mr-3" /> Netflix Accounts
+                                            </Link>
+                                        </div>
                                     )}
                                     <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-3 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 flex items-center">
                                         <LayoutDashboard className="w-5 h-5 mr-3" /> Dashboard

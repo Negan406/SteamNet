@@ -13,7 +13,8 @@ class OrderController extends Controller
 {
     public function __construct(
         protected PaymentService $paymentService,
-        protected IPTVService $iptvService
+        protected \App\Services\OrderService $orderService,
+        protected \App\Services\CmiService $cmiService
     ) {}
 
     public function store(Request $request)
@@ -26,11 +27,35 @@ class OrderController extends Controller
         $package = Package::findOrFail($validated['package_id']);
         $user = $request->user();
 
-        // Simulate payment
+        // Process payment
+        if ($validated['payment_method'] === 'cmi') {
+            $order = Order::create([
+                'user_id' => $user->id,
+                'package_id' => $package->id,
+                'amount' => $package->price,
+                'payment_method' => 'cmi',
+                'status' => 'pending',
+            ]);
+
+            $redirectData = $this->cmiService->prepareParameters(
+                $order,
+                $user,
+                url('/api/cmi/success'),
+                url('/api/cmi/failure'),
+                url('/api/cmi/callback')
+            );
+
+            return response()->json([
+                'message' => 'Redirecting to CMI...',
+                'payment_url' => $redirectData['url'],
+                'payment_params' => $redirectData['params']
+            ], 200);
+        }
+
         $paymentStatus = $this->paymentService->processPayment($user, $package->price, $validated['payment_method']);
 
         if (!$paymentStatus) {
-            return response()->json(['message' => 'Payment failed'], 400);
+            return response()->json(['message' => 'Payment failed or method not supported'], 400);
         }
 
         // Create Order
@@ -39,32 +64,28 @@ class OrderController extends Controller
             'package_id' => $package->id,
             'amount' => $package->price,
             'payment_method' => $validated['payment_method'],
-            'status' => 'completed',
+            'status' => $paymentStatus,
         ]);
 
-        // Provision IPTV Account
-        try {
-            $iptvAccount = $this->iptvService->provisionAccount($user, $package);
-        } catch (\Exception $e) {
-            // Rollback order since we can't fulfill it
-            $order->update(['status' => 'failed']);
-            return response()->json(['message' => $e->getMessage()], 400);
+        // If payment is instant, fulfill immediately
+        if ($paymentStatus === 'completed') {
+            try {
+                $result = $this->orderService->fulfill($order);
+                return response()->json([
+                    'message' => 'Order placed successfully',
+                    'order' => $result['order'],
+                    'account' => $result['account']
+                ], 201);
+            } catch (\Exception $e) {
+                $order->update(['status' => 'failed']);
+                return response()->json(['message' => $e->getMessage()], 400);
+            }
         }
 
-        // Create Subscription
-        $subscription = Subscription::create([
-            'user_id' => $user->id,
-            'package_id' => $package->id,
-            'start_date' => now(),
-            'end_date' => now()->addDays($package->duration_days),
-            'status' => 'active',
-        ]);
-
+        // For manual/pending payments, successfully return the order
         return response()->json([
-            'message' => 'Order placed successfully',
-            'order' => $order,
-            'subscription' => $subscription,
-            'iptv_account' => $iptvAccount
+            'message' => 'Order received. Please complete the payment to activate your account.',
+            'order' => $order
         ], 201);
     }
 

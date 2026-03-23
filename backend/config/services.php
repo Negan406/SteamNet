@@ -41,4 +41,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL'),
     ],
 
+    'cmi' => [
+        'client_id' => env('CMI_CLIENT_ID', '600001'),
+        'store_key' => env('CMI_STORE_KEY', 'TEST1234'),
+        'gateway_url' => env('CMI_GATEWAY_URL', 'https://testpayment.cmi.co.ma/fim/est3Dgate'),
+    ],
+
 ];

@@ -19,6 +19,7 @@ import SetupGuide from '../pages/SetupGuide';
 import AdminPanel from '../pages/AdminPanel';
 import AdminIptv from '../pages/AdminIptv';
 import AdminSubscriptions from '../pages/AdminSubscriptions';
+import AdminNetflix from '../pages/AdminNetflix';
 import PrivacyPolicy from '../pages/PrivacyPolicy';
 import TermsConditions from '../pages/TermsConditions';
 import RefundPolicy from '../pages/RefundPolicy';
@@ -82,6 +83,14 @@ export default function AppRouter() {
                             element={
                                 <PrivateRoute roleRequired="admin">
                                     <AdminSubscriptions />
+                                </PrivateRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/netflix"
+                            element={
+                                <PrivateRoute roleRequired="admin">
+                                    <AdminNetflix />
                                 </PrivateRoute>
                             }
                         />

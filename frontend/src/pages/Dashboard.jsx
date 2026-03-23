@@ -112,11 +112,14 @@ export default function Dashboard() {
                 </div>
                 {isAdmin && (
                     <div className="flex gap-3">
-                        <a href="/admin/iptv" className="px-5 py-2.5 bg-gray-900 border border-gray-800 text-gray-300 hover:text-white rounded-xl transition-all flex items-center shadow-lg text-sm font-semibold">
-                            <Database className="w-4 h-4 mr-2 text-indigo-400" /> Inventory
+                        <a href="/admin/iptv" className="px-5 py-2.5 bg-gray-900 border border-gray-800 text-gray-300 hover:text-white rounded-xl transition-all flex items-center shadow-lg text-sm font-semibold text-xs">
+                            <Database className="w-4 h-4 mr-2 text-indigo-400" /> IPTV
                         </a>
-                        <a href="/admin/subscriptions" className="px-5 py-2.5 bg-gray-900 border border-gray-800 text-gray-300 hover:text-white rounded-xl transition-all flex items-center shadow-lg text-sm font-semibold">
-                            <Receipt className="w-4 h-4 mr-2 text-purple-400" /> Sales Feed
+                        <a href="/admin/netflix" className="px-5 py-2.5 bg-gray-900 border border-gray-800 text-gray-300 hover:text-white rounded-xl transition-all flex items-center shadow-lg text-sm font-semibold text-xs">
+                            <Tv className="w-4 h-4 mr-2 text-red-500" /> Netflix
+                        </a>
+                        <a href="/admin/subscriptions" className="px-5 py-2.5 bg-gray-900 border border-gray-800 text-gray-300 hover:text-white rounded-xl transition-all flex items-center shadow-lg text-sm font-semibold text-xs">
+                            <Receipt className="w-4 h-4 mr-2 text-purple-400" /> Sales
                         </a>
                     </div>
                 )}
@@ -365,9 +368,10 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {((user?.iptv_accounts && user.iptv_accounts.length > 0) || (user?.iptvAccounts && user.iptvAccounts.length > 0)) ? (
+                        {((user?.iptv_accounts && user.iptv_accounts.length > 0) || (user?.iptvAccounts && user.iptvAccounts.length > 0) || (user?.netflix_accounts && user.netflix_accounts.length > 0) || (user?.netflixAccounts && user.netflixAccounts.length > 0)) ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10 flex-grow">
-                                {(user?.iptv_accounts || user?.iptvAccounts).filter(acc => acc.status === 'sold').map(account => {
+                                {/* IPTV Accounts */}
+                                {(user?.iptv_accounts || user?.iptvAccounts)?.filter(acc => acc.status === 'sold').map(account => {
                                     const m3uUrl = `${account.server_url}/get.php?username=${account.username}&password=${account.password}&type=m3u_plus&output=ts`;
                                     return (
                                         <div key={account.id} className="md:col-span-2 space-y-8">
@@ -437,6 +441,59 @@ export default function Dashboard() {
                                         </div>
                                     );
                                 })}
+
+                                {/* Netflix Accounts */}
+                                {(user?.netflix_accounts || user?.netflixAccounts)?.filter(acc => acc.status === 'sold').map(account => (
+                                    <div key={`netflix-${account.id}`} className="md:col-span-2 space-y-8 mt-12 pt-12 border-t border-gray-800/50">
+                                        <div className="flex items-center space-x-3 mb-4">
+                                            <div className="w-10 h-10 bg-red-600/20 rounded-xl flex items-center justify-center border border-red-500/30">
+                                                <Tv className="w-5 h-5 text-red-500" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-bold text-white">Netflix {account.category} Account</h3>
+                                                <p className="text-xs text-gray-500">Premium Streaming Access</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {[
+                                                { label: 'Login Email', val: account.email, icon: Users },
+                                                { label: 'Password', val: account.password, icon: Lock },
+                                                { label: 'Profile Name', val: account.profile_name, icon: Server },
+                                                { label: 'Profile PIN', val: account.pin, icon: Database }
+                                            ].map((field, i) => (
+                                                <div key={i} className="group/field relative">
+                                                    <div className="bg-black/50 border border-gray-800 rounded-2xl p-5 hover:border-red-500/40 transition-all duration-300 shadow-inner overflow-hidden">
+                                                        <div className="flex items-center justify-between mb-3 border-b border-gray-800/50 pb-2">
+                                                            <span className="text-[10px] text-gray-500 uppercase font-black tracking-widest flex items-center">
+                                                                <field.icon className="w-3 h-3 mr-2 text-red-500/70" />
+                                                                {field.label}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => handleCopy(field.val, field.label)}
+                                                                className="text-gray-600 hover:text-red-400 transition-all transform hover:scale-110"
+                                                            >
+                                                                <Copy className="w-3.5 h-3.5" />
+                                                            </button>
+                                                        </div>
+                                                        <div className="text-white font-mono text-xs truncate max-w-full font-semibold">
+                                                            {field.val || 'NO DATA'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {account.expire_date && (
+                                            <div className="bg-red-500/5 border border-red-500/10 rounded-2xl p-4 flex items-center justify-center space-x-3 text-red-400/80">
+                                                <Clock className="w-4 h-4" />
+                                                <span className="text-xs font-bold uppercase tracking-wider">
+                                                    Subscription Active Until: {new Date(account.expire_date).toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         ) : (
                             <div className="flex-grow flex flex-col items-center justify-center p-12 text-center relative z-10">

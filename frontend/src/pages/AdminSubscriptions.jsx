@@ -49,6 +49,27 @@ export default function AdminSubscriptions() {
         showToast(`${label} copied!`, 'success');
     };
 
+    const handleApprove = async (orderId) => {
+        try {
+            await api.post(`/admin/orders/${orderId}/approve`);
+            showToast('Order approved and account provisioned!', 'success');
+            fetchData();
+        } catch (error) {
+            showToast(error.response?.data?.message || 'Approval failed.', 'error');
+        }
+    };
+
+    const handleReject = async (orderId) => {
+        if (!window.confirm('Are you sure you want to cancel this order?')) return;
+        try {
+            await api.post(`/admin/orders/${orderId}/reject`);
+            showToast('Order rejected.', 'info');
+            fetchData();
+        } catch (error) {
+            showToast('Rejection failed.', 'error');
+        }
+    };
+
     if (loading) return <Loader text="Syncing Ledger..." />;
     if (!user || user.role !== 'admin') return <Navigate to="/" />;
 
@@ -124,18 +145,38 @@ export default function AdminSubscriptions() {
                                         {order.status === 'completed' ? (
                                             <span className="text-green-400 flex items-center font-bold text-xs"><CheckCircle className="w-4 h-4 mr-1" /> PAID</span>
                                         ) : order.status === 'failed' ? (
-                                            <span className="text-red-400 flex items-center font-bold text-xs"><AlertCircle className="w-4 h-4 mr-1" /> FAILED</span>
+                                            <span className="text-red-400 flex items-center font-bold text-xs"><AlertCircle className="w-4 h-4 mr-1" /> REJECTED</span>
                                         ) : (
-                                            <span className="text-yellow-400 flex items-center font-bold text-xs"><Clock className="w-4 h-4 mr-1" /> PENDING</span>
+                                            <div className="flex flex-col gap-2">
+                                                <span className="text-yellow-400 flex items-center font-bold text-xs animate-pulse"><Clock className="w-4 h-4 mr-1" /> PENDING</span>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleApprove(order.id)}
+                                                        className="bg-green-500/10 text-green-400 px-3 py-1 rounded text-[10px] font-black hover:bg-green-500/20 transition-all border border-green-500/20"
+                                                    >
+                                                        APPROVE
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReject(order.id)}
+                                                        className="bg-red-500/10 text-red-400 px-3 py-1 rounded text-[10px] font-black hover:bg-red-500/20 transition-all border border-red-500/20"
+                                                    >
+                                                        REJECT
+                                                    </button>
+                                                </div>
+                                            </div>
                                         )}
                                     </td>
                                     <td className="px-4 py-3">
-                                        <button
-                                            onClick={() => handleViewLogs(order.user)}
-                                            className="bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded text-[10px] font-black hover:bg-indigo-500/20 transition-all border border-indigo-500/20"
-                                        >
-                                            REVEAL KEYS
-                                        </button>
+                                        {order.status === 'completed' && (
+                                            <button
+                                                onClick={() => handleViewLogs(order.user)}
+                                                className="bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded text-[10px] font-black hover:bg-indigo-500/20 transition-all border border-indigo-500/20"
+                                            >
+                                                REVEAL KEYS
+                                            </button>
+                                        )}
+                                        {order.status === 'pending' && <span className="text-[10px] text-gray-600 font-bold italic tracking-wider">AWAITING ADM</span>}
+                                        {order.status === 'failed' && <span className="text-[10px] text-red-900 font-bold tracking-widest line-through">REVOKED</span>}
                                     </td>
                                 </tr>
                             ))}
