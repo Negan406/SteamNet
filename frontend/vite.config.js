@@ -8,4 +8,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    allowedHosts: [
+      'iptv-streamnet.site',
+      'www.iptv-streamnet.site',
+    ],
+  },
 })
